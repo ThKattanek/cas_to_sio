@@ -90,6 +90,16 @@ std::string CASFileClass::GetLastErrorString()
 	return last_error_string;
 }
 
+int CASFileClass::GetChunkTypeCount(uint32_t chunk_type)
+{
+	int count = 0;
+	for(int i=0; i<chunk_count; i++)
+		if(chunk[i].type == chunk_type)
+			count++;
+
+	return count;
+}
+
 int CASFileClass::ReadNextChunk(FILE *file)
 {
 	uint32_t chunk_type;

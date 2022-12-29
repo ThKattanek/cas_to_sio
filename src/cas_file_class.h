@@ -48,9 +48,9 @@ public:
 
 	bool Open(FILE *file);
 	void Close();
-
 	bool IsOpen();
 	std::string GetLastErrorString();
+	int GetChunkTypeCount(uint32_t chunk_type);
 
 private:
 	int ReadNextChunk(FILE *file);	// return 0=ok, 1=end of file, -1=unknow_chunk, -2=wrong chunk size, -3=chunk count is greater as 1024
