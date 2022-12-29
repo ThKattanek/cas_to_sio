@@ -17,7 +17,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QFileDialog>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent)
@@ -45,8 +45,14 @@ void MainWindow::on_actionOpen_CAS_Image_A8CAS_triggered()
 	if(filename != "")
 	{
 		QFileInfo dir(filename);
-		last_dir = dir.absoluteDir().absolutePath();
-		qDebug("%s", last_dir.toLatin1().data());
+		last_dir = dir.absolutePath();
+
+		FILE *file = qfopen(filename, "rb");
+
+		if(!cas.Open(file))
+		{
+			QMessageBox::critical(this, "CAS not open ...", QString::fromStdString(cas.GetLastErrorString()));
+		}
 	}
 }
 

@@ -18,8 +18,10 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QFileDialog>
 
 #include "./cas_file_class.h"
+#include "./qutils.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -38,5 +40,7 @@ private slots:
 
 private:
 	Ui::MainWindow *ui;
+
+	CASFileClass cas;
 };
 #endif // MAINWINDOW_H

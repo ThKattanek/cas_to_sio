@@ -18,6 +18,9 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+TARGET = castosio
+TEMPLATE = app
+
 CONFIG += c++17
 
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -31,7 +34,8 @@ SOURCES += \
 
 HEADERS += \
     cas_file_class.h \
-    mainwindow.h
+    mainwindow.h \
+    qutils.h
 
 FORMS += \
     mainwindow.ui
