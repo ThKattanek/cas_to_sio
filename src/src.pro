@@ -5,7 +5,7 @@
 #//						 //
 #// Atari Cas files send over sio bus with uart  //
 #//                                              //
-#// #file: cas_to_sio.pro                        //
+#// #file: src.pro                               //
 #//                                              //
 #// This source code is Copyright protected!     //
 #//                                              //
@@ -14,21 +14,29 @@
 #//                                              //
 #//////////////////////////////////////////////////
 
-TEMPLATE = subdirs
+QT       += core gui
 
-  SUBDIRS = cas_to_sio
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-  cas_to_sio.subdir = src
+CONFIG += c++17
 
-  CONFIG += ordered
+# You can make your code fail to compile if it uses deprecated APIs.
+# In order to do so, uncomment the following line.
+#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-# Example for more subdirs
-# SUBDIRS = src1\
-#            src2
-#
-# src1.subdir = src1
-# src2.subdir = src2
-#
-# app.depends = src1 src2
+SOURCES += \
+    cas_file_class.cpp \
+    main.cpp \
+    mainwindow.cpp
 
+HEADERS += \
+    cas_file_class.h \
+    mainwindow.h
 
+FORMS += \
+    mainwindow.ui
+
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
