@@ -50,11 +50,22 @@ public:
 	void Close();
 	bool IsOpen();
 	std::string GetLastErrorString();
-	int GetChunkTypeCount(uint32_t chunk_type);
+
+	int GetFujiChunkCount();
+	int GetBaudChunkCount();
+	int GetDataChunkCount();
+	int GetFskChunkCount();
+	int GetPWMSChunkCount();
+	int GetPWMCChunkCount();
+	int GetPWMDChunkCount();
+	int GetPWM1ChunkCount();
+
+	uint8_t *GetChunkDataPointer(int chunk_number);
 
 private:
 	int ReadNextChunk(FILE *file);	// return 0=ok, 1=end of file, -1=unknow_chunk, -2=wrong chunk size, -3=chunk count is greater as 1024
 	void ClearChunk(int number);
+	int GetChunkTypeCount(uint32_t chunk_type);
 
 	std::string last_error_string;
 	CHUNK chunk[MAX_CHUNK_NUM];

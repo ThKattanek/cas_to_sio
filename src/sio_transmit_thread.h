@@ -5,48 +5,50 @@
 //												//
 // Atari Cas files send over sio bus with uart  //
 //                                              //
-// #file: mainwindow.h                          //
+// #file: sio_transmit_thread.h                 //
 //                                              //
 // This source code is Copyright protected!     //
 //                                              //
-// Last changed at 2022-12-29                   //
+// Last changed at 2023-01-01                   //
 // https://github.com/ThKattanek/cas_to_sio     //
 //                                              //
 //////////////////////////////////////////////////
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef SIOTRANSMITTHREAD_H
+#define SIOTRANSMITTHREAD_H
 
-#include <QMainWindow>
-#include <QFileDialog>
+#include <QProgressBar>
+#include <QThread>
+#include <QStringList>
+
+#include <libserialport.h>
 
 #include "./cas_file_class.h"
-#include "./sio_transmit_thread.h"
-#include "./qutils.h"
 
-QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
-QT_END_NAMESPACE
-
-class MainWindow : public QMainWindow
+class SIOTransmitThread : public QThread
 {
 	Q_OBJECT
 
 public:
-	MainWindow(QWidget *parent = nullptr);
-	~MainWindow();
+	SIOTransmitThread(QObject*);
+	~SIOTransmitThread();
+	QStringList GetAllSerialPortNames();
 
-private slots:
-	void on_actionOpen_CAS_Image_A8CAS_triggered();
+	QString serial_port_name;
 
-	void on_start_transfer_clicked();
+	QProgressBar *progress_bar;
+	CASFileClass *cas;
+
+public slots:
+	void OnBytesWritten(qint64 bytes);
 
 private:
 	void InitSerialPort();
+	struct sp_port **port_list;
+	bool thread_end;
 
-	Ui::MainWindow *ui;
-	CASFileClass cas;
-
-	SIOTransmitThread *transmitter;
+protected:
+	void run() override;
 };
-#endif // MAINWINDOW_H
+
+#endif // SIOTRANSMITTHREAD_H

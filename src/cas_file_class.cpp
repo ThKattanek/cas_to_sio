@@ -90,6 +90,52 @@ std::string CASFileClass::GetLastErrorString()
 	return last_error_string;
 }
 
+int CASFileClass::GetFujiChunkCount()
+{
+	return GetChunkTypeCount(CHUNK_TYPE_FUJI);
+}
+
+int CASFileClass::GetBaudChunkCount()
+{
+	return GetChunkTypeCount(CHUNK_TYPE_BAUD);
+}
+
+int CASFileClass::GetDataChunkCount()
+{
+	return GetChunkTypeCount(CHUNK_TYPE_DATA);
+}
+
+int CASFileClass::GetFskChunkCount()
+{
+	return GetChunkTypeCount(CHUNK_TYPE_FSK);
+}
+
+int CASFileClass::GetPWMSChunkCount()
+{
+	return GetChunkTypeCount(CHUNK_TYPE_PWMS);
+}
+
+int CASFileClass::GetPWMCChunkCount()
+{
+	return GetChunkTypeCount(CHUNK_TYPE_PWMC);
+}
+
+int CASFileClass::GetPWMDChunkCount()
+{
+	return GetChunkTypeCount(CHUNK_TYPE_PWMD);
+}
+
+int CASFileClass::GetPWM1ChunkCount()
+{
+	return GetChunkTypeCount(CHUNK_TYPE_PWM1);
+}
+
+uint8_t *CASFileClass::GetChunkDataPointer(int chunk_number)
+{
+	if(chunk_number < chunk_count)
+		return chunk[chunk_number].data;
+}
+
 int CASFileClass::GetChunkTypeCount(uint32_t chunk_type)
 {
 	int count = 0;

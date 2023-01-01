@@ -30,15 +30,20 @@ CONFIG += c++17
 SOURCES += \
     cas_file_class.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    sio_transmit_thread.cpp
 
 HEADERS += \
     cas_file_class.h \
     mainwindow.h \
-    qutils.h
+    qutils.h \
+    sio_transmit_thread.h
 
 FORMS += \
     mainwindow.ui
+
+LIBS += \
+    -lserialport
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
