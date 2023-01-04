@@ -9,7 +9,7 @@
 //                                              //
 // This source code is Copyright protected!     //
 //                                              //
-// Last changed at 2022-12-29                   //
+// Last changed at 2023-01-04                   //
 // https://github.com/ThKattanek/cas_to_sio     //
 //                                              //
 //////////////////////////////////////////////////
@@ -38,12 +38,10 @@ public:
 
 private slots:
 	void on_actionOpen_CAS_Image_A8CAS_triggered();
-
-	void on_start_transfer_clicked();
+	void on_cas_open_button_clicked();
+	void on_cas_start_button_clicked();
 
 private:
-	void InitSerialPort();
-
 	Ui::MainWindow *ui;
 	CASFileClass cas;
 

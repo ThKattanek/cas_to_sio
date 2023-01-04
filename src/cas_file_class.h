@@ -9,7 +9,7 @@
 //                                              //
 // This source code is Copyright protected!     //
 //                                              //
-// Last changed at 2022-12-29                   //
+// Last changed at 2023-01-04                   //
 // https://github.com/ThKattanek/cas_to_sio     //
 //                                              //
 //////////////////////////////////////////////////
@@ -60,6 +60,9 @@ public:
 	int GetPWMDChunkCount();
 	int GetPWM1ChunkCount();
 
+	int GetChunkCount();
+	CHUNK* GetChunk(int chunk_number);
+	uint32_t GetChunkType(int chunk_number);
 	uint8_t *GetChunkDataPointer(int chunk_number);
 
 private:

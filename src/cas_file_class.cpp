@@ -9,7 +9,7 @@
 //                                              //
 // This source code is Copyright protected!     //
 //                                              //
-// Last changed at 2022-12-29                   //
+// Last changed at 2023-01-04                   //
 // https://github.com/ThKattanek/cas_to_sio     //
 //                                              //
 //////////////////////////////////////////////////
@@ -130,10 +130,33 @@ int CASFileClass::GetPWM1ChunkCount()
 	return GetChunkTypeCount(CHUNK_TYPE_PWM1);
 }
 
+int CASFileClass::GetChunkCount()
+{
+	return chunk_count;
+}
+
+CHUNK *CASFileClass::GetChunk(int chunk_number)
+{
+	if(chunk_number < chunk_count)
+		return &chunk[chunk_number];
+	else
+		return nullptr;
+}
+
+uint32_t CASFileClass::GetChunkType(int chunk_number)
+{
+	if(chunk_number < chunk_count)
+		return chunk[chunk_number].type;
+	else
+		return 0;
+}
+
 uint8_t *CASFileClass::GetChunkDataPointer(int chunk_number)
 {
 	if(chunk_number < chunk_count)
 		return chunk[chunk_number].data;
+	else
+		return nullptr;
 }
 
 int CASFileClass::GetChunkTypeCount(uint32_t chunk_type)

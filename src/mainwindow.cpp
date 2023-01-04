@@ -9,7 +9,7 @@
 //                                              //
 // This source code is Copyright protected!     //
 //                                              //
-// Last changed at 2022-12-29                   //
+// Last changed at 2023-01-04                   //
 // https://github.com/ThKattanek/cas_to_sio     //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,7 +19,6 @@
 
 #include <QMessageBox>
 #include <QStringList>
-#include <libserialport.h>>
 
 MainWindow::MainWindow(QWidget *parent)
 	: QMainWindow(parent)
@@ -28,12 +27,13 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->setupUi(this);
 	this->setWindowTitle("CasToSio");
 
-	InitSerialPort();
-
 	transmitter = new SIOTransmitThread(this);
 
 	QStringList port_list = transmitter->GetAllSerialPortNames();
 	ui->serial_ports->addItems(port_list);
+
+	ui->baudrate_spin->setValue(transmitter->GetBaudRateFactor() * 100.0f);
+	ui->irg_time_spin->setValue(transmitter->GetMaxIrgTime());
 }
 
 MainWindow::~MainWindow()
@@ -86,23 +86,22 @@ void MainWindow::on_actionOpen_CAS_Image_A8CAS_triggered()
 			count = cas.GetPWM1ChunkCount();
 			out_message += tr("PWM1 Chunk Count: ") + QString::number(count) + "\n";
 
-			QMessageBox::information(this, tr("CAS Information"), out_message);
+			// QMessageBox::information(this, tr("CAS Information"), out_message);
 		}
 	}
 }
 
-void MainWindow::InitSerialPort()
+void MainWindow::on_cas_open_button_clicked()
 {
-	/*
-	serial_port_info = new QSerialPortInfo();
-	for(int i=0; i<serial_port_info->availablePorts().length(); i++)
-		ui->serial_ports->addItem(serial_port_info->availablePorts()[i].portName());
-	*/
+	on_actionOpen_CAS_Image_A8CAS_triggered();
 }
 
 
-void MainWindow::on_start_transfer_clicked()
+void MainWindow::on_cas_start_button_clicked()
 {
+	transmitter->SetBaudRateFactor(ui->baudrate_spin->value() / 100.0f);
+	transmitter->SetMaxIrgTime(ui->irg_time_spin->value());
+
 	transmitter->cas = &cas;
 	transmitter->progress_bar = ui->transmit_progress;
 	transmitter->serial_port_name = ui->serial_ports->currentText();

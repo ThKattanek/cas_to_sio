@@ -9,7 +9,7 @@
 //                                              //
 // This source code is Copyright protected!     //
 //                                              //
-// Last changed at 2023-01-01                   //
+// Last changed at 2023-01-04                   //
 // https://github.com/ThKattanek/cas_to_sio     //
 //                                              //
 //////////////////////////////////////////////////
@@ -34,6 +34,12 @@ public:
 	~SIOTransmitThread();
 	QStringList GetAllSerialPortNames();
 
+	void SetBaudRateFactor(float baudrate_factor);
+	void SetMaxIrgTime(int max_irg_time);
+
+	float GetBaudRateFactor();
+	int GetMaxIrgTime();
+
 	QString serial_port_name;
 
 	QProgressBar *progress_bar;
@@ -43,9 +49,15 @@ public slots:
 	void OnBytesWritten(qint64 bytes);
 
 private:
-	void InitSerialPort();
-	struct sp_port **port_list;
+	bool OpenSerialPort();
+	void CloseSerialPort();
+
+	sp_port* port;
+	struct sp_event_set *event_set;
 	bool thread_end;
+
+	int max_irg_time;			// in ms (Default 20000)
+	float baudrate_factor;		// Default 1.0 (Example 1.1 = 110%, 0.9 = 90%
 
 protected:
 	void run() override;
