@@ -45,6 +45,12 @@ FORMS += \
 LIBS += \
     -lserialport
 
+win32 {
+    PKGCONFIG += quazip
+} else {
+    LIBS += -lquazip5
+}
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin

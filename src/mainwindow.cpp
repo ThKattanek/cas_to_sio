@@ -17,6 +17,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <iostream>
+#include <zip.h>
+
 #include <QMessageBox>
 #include <QStringList>
 
@@ -52,13 +55,60 @@ void MainWindow::on_actionOpen_CAS_Image_A8CAS_triggered()
 	if(last_dir.isEmpty())
 		last_dir = QDir::homePath();
 
-	QString filename = QFileDialog::getOpenFileName(this, tr("Atari CAS File open "), last_dir, tr("CAS Files ") + "(*.cas);;" + tr("All Files ") + "(*.*)", 0, QFileDialog::DontUseNativeDialog);
+	QString unzip_filename = "/home/thorsten/test.cas";
+	bool is_zip = false;
+
+	QString filename = QFileDialog::getOpenFileName(this, tr("Atari CAS File open "), last_dir, tr("CAS Files ") + "(*.cas *.zip);;" + tr("All Files ") + "(*.*)", 0, QFileDialog::DontUseNativeDialog);
 	if(filename != "")
 	{
-		QFileInfo dir(filename);
-		last_dir = dir.absolutePath();
+		QFileInfo file_info(filename);
+		last_dir = file_info.absolutePath();
 
-		FILE *file = qfopen(filename, "rb");
+		if(file_info.suffix().toLower() == "zip")
+		{
+			QuaZip zip(filename);
+			if(zip.open(QuaZip::mdUnzip))
+			{
+				QString first_file_name = zip.getFileNameList()[0];
+				std::cout << "Zip is Open. " << zip.getEntriesCount() << " [" << first_file_name.toLocal8Bit().data() << "]" << std::endl;
+
+				QuaZipFile zf(&zip);
+				if(!zip.setCurrentFile(first_file_name))
+				{
+					std::cout << "Fehler in ZIP-Datei: " << first_file_name.toLocal8Bit().data() << std::endl;
+					return;
+				}
+
+				if(!zf.open(QIODevice::ReadOnly))
+				{
+					std::cout << "Fehler beim Öffnen des ZIPFiles: " << first_file_name.toLocal8Bit().data();
+				}
+
+				QFile outfile(unzip_filename);
+				if(outfile.open(QIODevice::ReadWrite))
+				{
+					outfile.write(zf.readAll());
+					outfile.close();
+				}
+				else
+				{
+					zf.close();
+					zip.close();
+					return;
+				}
+
+				zf.close();
+				zip.close();
+				is_zip = true;
+			}
+		}
+
+		FILE *file;
+
+		if(!is_zip)
+			file = qfopen(filename, "rb");
+		else
+			file = qfopen(unzip_filename, "rb");
 
 		if(!cas.Open(file))
 		{
@@ -87,6 +137,13 @@ void MainWindow::on_actionOpen_CAS_Image_A8CAS_triggered()
 			out_message += tr("PWM1 Chunk Count: ") + QString::number(count) + "\n";
 
 			// QMessageBox::information(this, tr("CAS Information"), out_message);
+		}
+
+		if(is_zip)
+		{
+			QFile file(unzip_filename);
+			if(file.exists())
+				file.remove();
 		}
 	}
 }
