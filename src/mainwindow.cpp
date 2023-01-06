@@ -18,7 +18,6 @@
 #include "ui_mainwindow.h"
 
 #include <iostream>
-#include <zip.h>
 
 #include <QMessageBox>
 #include <QStringList>

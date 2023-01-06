@@ -42,13 +42,12 @@ HEADERS += \
 FORMS += \
     mainwindow.ui
 
-LIBS += \
-    -lserialport
-
 win32 {
+    CONFIG += link_pkgconfig
     PKGCONFIG += quazip
+    PKGCONFIG += libserialport
 } else {
-    LIBS += -lquazip5
+    LIBS += -lquazip5 -lserialport
 }
 
 # Default rules for deployment.
