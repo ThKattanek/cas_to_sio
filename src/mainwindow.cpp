@@ -55,7 +55,8 @@ void MainWindow::on_actionOpen_CAS_Image_A8CAS_triggered()
 	if(last_dir.isEmpty())
 		last_dir = QDir::homePath();
 
-	QString unzip_filename = "/home/thorsten/test.cas";
+	QString unzip_filename = QDir::tempPath() + "/";
+
 	bool is_zip = false;
 
 	QString filename = QFileDialog::getOpenFileName(this, tr("Atari CAS File open "), last_dir, tr("CAS Files ") + "(*.cas *.zip);;" + tr("All Files ") + "(*.*)", 0, QFileDialog::DontUseNativeDialog);
@@ -70,6 +71,8 @@ void MainWindow::on_actionOpen_CAS_Image_A8CAS_triggered()
 			if(zip.open(QuaZip::mdUnzip))
 			{
 				QString first_file_name = zip.getFileNameList()[0];
+				unzip_filename += first_file_name;
+
 				std::cout << "Zip is Open. " << zip.getEntriesCount() << " [" << first_file_name.toLocal8Bit().data() << "]" << std::endl;
 
 				QuaZipFile zf(&zip);
@@ -113,30 +116,6 @@ void MainWindow::on_actionOpen_CAS_Image_A8CAS_triggered()
 		if(!cas.Open(file))
 		{
 			QMessageBox::critical(this, tr("CAS not open ..."), QString::fromStdString(cas.GetLastErrorString()));
-		}
-		else
-		{
-			QString out_message;
-
-			int count;
-			count = cas.GetFujiChunkCount();
-			out_message += tr("FUJI Chunk Count: ") + QString::number(count) + "\n";
-			count = cas.GetBaudChunkCount();
-			out_message += tr("BAUD Chunk Count: ") + QString::number(count) + "\n";
-			count = cas.GetDataChunkCount();
-			out_message += tr("DATA Chunk Count: ") + QString::number(count) + "\n";
-			count = cas.GetFskChunkCount();
-			out_message += tr("FSK Chunk Count: ") + QString::number(count) + "\n";
-			count = cas.GetPWMSChunkCount();
-			out_message += tr("PWMS Chunk Count: ") + QString::number(count) + "\n";
-			count = cas.GetPWMCChunkCount();
-			out_message += tr("PWMC Chunk Count: ") + QString::number(count) + "\n";
-			count = cas.GetPWMDChunkCount();
-			out_message += tr("PWMD Chunk Count: ") + QString::number(count) + "\n";
-			count = cas.GetPWM1ChunkCount();
-			out_message += tr("PWM1 Chunk Count: ") + QString::number(count) + "\n";
-
-			// QMessageBox::information(this, tr("CAS Information"), out_message);
 		}
 
 		if(is_zip)
