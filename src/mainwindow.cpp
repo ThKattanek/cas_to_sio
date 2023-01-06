@@ -17,6 +17,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <iostream>
+#include <zip.h>
+
 #include <QMessageBox>
 #include <QStringList>
 
@@ -52,41 +55,74 @@ void MainWindow::on_actionOpen_CAS_Image_A8CAS_triggered()
 	if(last_dir.isEmpty())
 		last_dir = QDir::homePath();
 
-	QString filename = QFileDialog::getOpenFileName(this, tr("Atari CAS File open "), last_dir, tr("CAS Files ") + "(*.cas);;" + tr("All Files ") + "(*.*)", 0, QFileDialog::DontUseNativeDialog);
+	QString unzip_filename = QDir::tempPath() + "/";
+
+	bool is_zip = false;
+
+	QString filename = QFileDialog::getOpenFileName(this, tr("Atari CAS File open "), last_dir, tr("CAS Files ") + "(*.cas *.zip);;" + tr("All Files ") + "(*.*)", 0, QFileDialog::DontUseNativeDialog);
 	if(filename != "")
 	{
-		QFileInfo dir(filename);
-		last_dir = dir.absolutePath();
+		QFileInfo file_info(filename);
+		last_dir = file_info.absolutePath();
 
-		FILE *file = qfopen(filename, "rb");
+		if(file_info.suffix().toLower() == "zip")
+		{
+			QuaZip zip(filename);
+			if(zip.open(QuaZip::mdUnzip))
+			{
+				QString first_file_name = zip.getFileNameList()[0];
+				unzip_filename += first_file_name;
+
+				std::cout << "Zip is Open. " << zip.getEntriesCount() << " [" << first_file_name.toLocal8Bit().data() << "]" << std::endl;
+
+				QuaZipFile zf(&zip);
+				if(!zip.setCurrentFile(first_file_name))
+				{
+					std::cout << "Fehler in ZIP-Datei: " << first_file_name.toLocal8Bit().data() << std::endl;
+					return;
+				}
+
+				if(!zf.open(QIODevice::ReadOnly))
+				{
+					std::cout << "Fehler beim Öffnen des ZIPFiles: " << first_file_name.toLocal8Bit().data();
+				}
+
+				QFile outfile(unzip_filename);
+				if(outfile.open(QIODevice::ReadWrite))
+				{
+					outfile.write(zf.readAll());
+					outfile.close();
+				}
+				else
+				{
+					zf.close();
+					zip.close();
+					return;
+				}
+
+				zf.close();
+				zip.close();
+				is_zip = true;
+			}
+		}
+
+		FILE *file;
+
+		if(!is_zip)
+			file = qfopen(filename, "rb");
+		else
+			file = qfopen(unzip_filename, "rb");
 
 		if(!cas.Open(file))
 		{
 			QMessageBox::critical(this, tr("CAS not open ..."), QString::fromStdString(cas.GetLastErrorString()));
 		}
-		else
+
+		if(is_zip)
 		{
-			QString out_message;
-
-			int count;
-			count = cas.GetFujiChunkCount();
-			out_message += tr("FUJI Chunk Count: ") + QString::number(count) + "\n";
-			count = cas.GetBaudChunkCount();
-			out_message += tr("BAUD Chunk Count: ") + QString::number(count) + "\n";
-			count = cas.GetDataChunkCount();
-			out_message += tr("DATA Chunk Count: ") + QString::number(count) + "\n";
-			count = cas.GetFskChunkCount();
-			out_message += tr("FSK Chunk Count: ") + QString::number(count) + "\n";
-			count = cas.GetPWMSChunkCount();
-			out_message += tr("PWMS Chunk Count: ") + QString::number(count) + "\n";
-			count = cas.GetPWMCChunkCount();
-			out_message += tr("PWMC Chunk Count: ") + QString::number(count) + "\n";
-			count = cas.GetPWMDChunkCount();
-			out_message += tr("PWMD Chunk Count: ") + QString::number(count) + "\n";
-			count = cas.GetPWM1ChunkCount();
-			out_message += tr("PWM1 Chunk Count: ") + QString::number(count) + "\n";
-
-			// QMessageBox::information(this, tr("CAS Information"), out_message);
+			QFile file(unzip_filename);
+			if(file.exists())
+				file.remove();
 		}
 	}
 }
@@ -99,12 +135,15 @@ void MainWindow::on_cas_open_button_clicked()
 
 void MainWindow::on_cas_start_button_clicked()
 {
-	transmitter->SetBaudRateFactor(ui->baudrate_spin->value() / 100.0f);
-	transmitter->SetMaxIrgTime(ui->irg_time_spin->value());
+	if(cas.IsOpen())
+	{
+		transmitter->SetBaudRateFactor(ui->baudrate_spin->value() / 100.0f);
+		transmitter->SetMaxIrgTime(ui->irg_time_spin->value());
 
-	transmitter->cas = &cas;
-	transmitter->progress_bar = ui->transmit_progress;
-	transmitter->serial_port_name = ui->serial_ports->currentText();
-	transmitter->start();
+		transmitter->cas = &cas;
+		transmitter->progress_bar = ui->transmit_progress;
+		transmitter->serial_port_name = ui->serial_ports->currentText();
+		transmitter->start();
+	}
 }
 
