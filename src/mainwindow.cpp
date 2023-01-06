@@ -156,12 +156,15 @@ void MainWindow::on_cas_open_button_clicked()
 
 void MainWindow::on_cas_start_button_clicked()
 {
-	transmitter->SetBaudRateFactor(ui->baudrate_spin->value() / 100.0f);
-	transmitter->SetMaxIrgTime(ui->irg_time_spin->value());
+	if(cas.IsOpen())
+	{
+		transmitter->SetBaudRateFactor(ui->baudrate_spin->value() / 100.0f);
+		transmitter->SetMaxIrgTime(ui->irg_time_spin->value());
 
-	transmitter->cas = &cas;
-	transmitter->progress_bar = ui->transmit_progress;
-	transmitter->serial_port_name = ui->serial_ports->currentText();
-	transmitter->start();
+		transmitter->cas = &cas;
+		transmitter->progress_bar = ui->transmit_progress;
+		transmitter->serial_port_name = ui->serial_ports->currentText();
+		transmitter->start();
+	}
 }
 
