@@ -50,8 +50,9 @@ private slots:
 	void on_cas_start_button_clicked();
 
 private:
-	Ui::MainWindow *ui;
+	void SetPlayTime();
 
+	Ui::MainWindow *ui;
 	CASFileClass cas;
 	SIOTransmitThread *transmitter;
 };

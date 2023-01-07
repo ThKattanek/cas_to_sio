@@ -65,6 +65,8 @@ public:
 	uint32_t GetChunkType(int chunk_number);
 	uint8_t *GetChunkDataPointer(int chunk_number);
 
+	int GetPlayTime(int max_irg_time, float baudrate_factor);	// return time in ms
+
 private:
 	int ReadNextChunk(FILE *file);	// return 0=ok, 1=end of file, -1=unknow_chunk, -2=wrong chunk size, -3=chunk count is greater as 1024
 	void ClearChunk(int number);

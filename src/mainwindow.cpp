@@ -86,7 +86,7 @@ void MainWindow::on_actionOpen_CAS_Image_A8CAS_triggered()
 				QString first_file_name = zip.getFileNameList()[0];
 				unzip_filename += first_file_name;
 
-				std::cout << "Zip is Open. " << zip.getEntriesCount() << " [" << first_file_name.toLocal8Bit().data() << "]" << std::endl;
+				//std::cout << "Zip is Open. " << zip.getEntriesCount() << " [" << first_file_name.toLocal8Bit().data() << "]" << std::endl;
 
 				QuaZipFile zf(&zip);
 				if(!zip.setCurrentFile(first_file_name))
@@ -116,6 +116,8 @@ void MainWindow::on_actionOpen_CAS_Image_A8CAS_triggered()
 				zf.close();
 				zip.close();
 				is_zip = true;
+
+				ui->filename_label->setText(first_file_name.toLocal8Bit().data());
 			}
 		}
 
@@ -129,6 +131,10 @@ void MainWindow::on_actionOpen_CAS_Image_A8CAS_triggered()
 		if(!cas.Open(file))
 		{
 			QMessageBox::critical(this, tr("CAS not open ..."), QString::fromStdString(cas.GetLastErrorString()));
+		}
+		else
+		{
+			SetPlayTime();
 		}
 
 		if(is_zip)
@@ -158,5 +164,25 @@ void MainWindow::on_cas_start_button_clicked()
 		transmitter->serial_port_name = ui->serial_ports->currentText();
 		transmitter->start();
 	}
+}
+
+void MainWindow::SetPlayTime()
+{
+	int time = cas.GetPlayTime(ui->irg_time_spin->value(), ui->baudrate_spin->value() / 100.0f);
+
+	time /=100;
+
+	int ss = time % 10;
+	time /= 10;
+	int s = time % 60;
+	time /= 60;
+	int m = time % 60;
+	time /= 60;
+	int h = time % 60;
+	time /= 60;
+
+	QString out = QString::number(h).rightJustified(2, '0') + ":" + QString::number(m).rightJustified(2, '0') + ":" + QString::number(s).rightJustified(2, '0') + "." + QString::number(ss).rightJustified(1, '0');
+
+	ui->playtime_label->setText(out);
 }
 

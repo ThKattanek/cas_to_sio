@@ -169,6 +169,35 @@ int CASFileClass::GetChunkTypeCount(uint32_t chunk_type)
 	return count;
 }
 
+int CASFileClass::GetPlayTime(int max_irg_time, float baudrate_factor)
+{
+	int baudrate = 600 * baudrate_factor;
+	int irg_time;
+	int time = 0;
+
+	for(int i=0; i<chunk_count; i++)
+	{
+		switch(chunk[i].type)
+		{
+		case CHUNK_TYPE_BAUD:
+			baudrate = chunk[i].aux[0] | (chunk[i].aux[1] << 8);
+			baudrate *= baudrate_factor;
+			break;
+		case CHUNK_TYPE_DATA:
+			irg_time = chunk[i].aux[0] | (chunk[i].aux[1] << 8);
+			if(max_irg_time > 0)
+			{
+				if(irg_time > max_irg_time)
+					irg_time = max_irg_time;
+			}
+			time += irg_time;	// Add IRG Time
+			time += (chunk[i].length * 10000) / baudrate;		// Time for transmission
+			break;
+		}
+	}
+	return time;
+}
+
 int CASFileClass::ReadNextChunk(FILE *file)
 {
 	uint32_t chunk_type;
