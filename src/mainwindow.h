@@ -49,6 +49,10 @@ private slots:
 	void on_cas_open_button_clicked();
 	void on_cas_start_button_clicked();
 
+	void on_baudrate_spin_valueChanged(int arg1);
+
+	void on_irg_time_spin_valueChanged(int arg1);
+
 private:
 	void SetPlayTime();
 

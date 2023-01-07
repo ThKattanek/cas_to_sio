@@ -168,21 +168,36 @@ void MainWindow::on_cas_start_button_clicked()
 
 void MainWindow::SetPlayTime()
 {
-	int time = cas.GetPlayTime(ui->irg_time_spin->value(), ui->baudrate_spin->value() / 100.0f);
+	if(cas.IsOpen())
+	{
+		int time = cas.GetPlayTime(ui->irg_time_spin->value(), ui->baudrate_spin->value() / 100.0f);
 
-	time /=100;
+		time /=100;
 
-	int ss = time % 10;
-	time /= 10;
-	int s = time % 60;
-	time /= 60;
-	int m = time % 60;
-	time /= 60;
-	int h = time % 60;
-	time /= 60;
+		int ss = time % 10;
+		time /= 10;
+		int s = time % 60;
+		time /= 60;
+		int m = time % 60;
+		time /= 60;
+		int h = time % 60;
+		time /= 60;
 
-	QString out = QString::number(h).rightJustified(2, '0') + ":" + QString::number(m).rightJustified(2, '0') + ":" + QString::number(s).rightJustified(2, '0') + "." + QString::number(ss).rightJustified(1, '0');
+		QString out = QString::number(h).rightJustified(2, '0') + ":" + QString::number(m).rightJustified(2, '0') + ":" + QString::number(s).rightJustified(2, '0') + "." + QString::number(ss).rightJustified(1, '0');
 
-	ui->playtime_label->setText(out);
+		ui->playtime_label->setText(out);
+	}
+}
+
+
+void MainWindow::on_baudrate_spin_valueChanged(int arg1)
+{
+	SetPlayTime();
+}
+
+
+void MainWindow::on_irg_time_spin_valueChanged(int arg1)
+{
+	SetPlayTime();
 }
 
