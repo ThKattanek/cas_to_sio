@@ -9,10 +9,12 @@
 #//                                              //
 #// This source code is Copyright protected!     //
 #//                                              //
-#// Last changed at 2022-12-29                   //
+#// Last changed at 2023-01-07                   //
 #// https://github.com/ThKattanek/cas_to_sio     //
 #//                                              //
 #//////////////////////////////////////////////////
+
+!win32:isEmpty(PREFIX):PREFIX=/usr/local
 
 QT       += core gui
 
@@ -23,9 +25,28 @@ TEMPLATE = app
 
 CONFIG += c++17
 
-# You can make your code fail to compile if it uses deprecated APIs.
-# In order to do so, uncomment the following line.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+CASTOSIO_VERSION = 0.1.0
+
+# Versionsnummer ermitteln aus Git Tag Nummer
+GIT_VERSION = $$system(git --git-dir \"../.git\" describe --always --tags)
+isEmpty(GIT_VERSION) {
+  GIT_VERSION = $$CASTOSIO_VERSION
+}
+DEFINES += VERSION_STRING=\\\"$$GIT_VERSION\\\"
+
+message("CasToSio Version: " $$GIT_VERSION)
+
+contains(QT_ARCH, x86_64){
+    CASTOSIO_ARCH = 64Bit
+} else:contains(QT_ARCH, i[3456]86) {
+    CASTOSIO_ARCH = 32Bit
+} else {
+    CASTOSIO_ARCH = Unknown
+}
+
+DEFINES += ARCHITECTURE_STRING=\\\"$$CASTOSIO_ARCH\\\"
+
+message("CasToSio Architecture: " $$CASTOSIO_ARCH)
 
 SOURCES += \
     cas_file_class.cpp \
@@ -49,6 +70,25 @@ win32 {
 } else {
     LIBS += -lquazip5 -lserialport
 }
+
+# Installation
+
+message(Installpath: $$PREFIX)
+DEFINES += DATA_PATH=\\\"$$PREFIX\\\"
+
+win32 {
+    target.path = $$PREFIX
+    txt.path = $$PREFIX
+} else {
+    target.path = $$PREFIX/bin
+    txt.path = $$PREFIX/share/doc/$$TARGET
+}
+
+# TXT
+txt.CONFIG += nostrip
+txt.files += ../LICENSE
+
+INSTALLS += target txt
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

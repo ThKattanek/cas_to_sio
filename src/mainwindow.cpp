@@ -9,7 +9,7 @@
 //                                              //
 // This source code is Copyright protected!     //
 //                                              //
-// Last changed at 2023-01-04                   //
+// Last changed at 2023-01-07                   //
 // https://github.com/ThKattanek/cas_to_sio     //
 //                                              //
 //////////////////////////////////////////////////
@@ -36,6 +36,20 @@ MainWindow::MainWindow(QWidget *parent)
 
 	ui->baudrate_spin->setValue(transmitter->GetBaudRateFactor() * 100.0f);
 	ui->irg_time_spin->setValue(transmitter->GetMaxIrgTime());
+
+#ifdef _WIN32
+	setWindowTitle("CasToSio Version " + QString(VERSION_STRING) + " --- [Windows " + QString(ARCHITECTURE_STRING) + "]");
+#else
+# ifdef __linux__
+	setWindowTitle("CasToSio Version " + QString(VERSION_STRING) + " --- [Linux " + QString(ARCHITECTURE_STRING) + "]");
+# else
+#  ifdef __FreeBSD__
+	setWindowTitle("CasToSio Version " + QString(VERSION_STRING) + " --- [FreeBSD " + QString(ARCHITECTURE_STRING) + "]");
+#  else
+	setWindowTitle("CasToSio Version " + QString(VERSION_STRING) + " --- [POSIX (unknown) " + QString(ARCHITECTURE_STRING) + "]");
+#  endif
+# endif
+#endif
 }
 
 MainWindow::~MainWindow()
