@@ -9,7 +9,7 @@
 //                                              //
 // This source code is Copyright protected!     //
 //                                              //
-// Last changed at 2023-01-07                   //
+// Last changed at 2023-01-21                   //
 // https://github.com/ThKattanek/cas_to_sio     //
 //                                              //
 //////////////////////////////////////////////////
@@ -37,6 +37,13 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->baudrate_spin->setValue(transmitter->GetBaudRateFactor() * 100.0f);
 	ui->irg_time_spin->setValue(transmitter->GetMaxIrgTime());
 
+	SetCasButtons(true, false, false, false);
+
+	ui->cas_play_status->setText("");
+
+	connect(transmitter, SIGNAL(CasIsEnd()), this, SLOT(OnCasIsEnd()));
+	connect(transmitter, SIGNAL(ChangeProgress(int)), this, SLOT(OnChangeProgress(int)));
+
 #ifdef _WIN32
 	setWindowTitle("CasToSio Version " + QString(VERSION_STRING) + " --- [Windows " + QString(ARCHITECTURE_STRING) + "]");
 #else
@@ -54,6 +61,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+	transmitter->Stop();
+
 	if(transmitter != nullptr)
 		delete transmitter;
 
@@ -91,13 +100,13 @@ void MainWindow::on_actionOpen_CAS_Image_A8CAS_triggered()
 				QuaZipFile zf(&zip);
 				if(!zip.setCurrentFile(first_file_name))
 				{
-					std::cout << "Fehler in ZIP-Datei: " << first_file_name.toLocal8Bit().data() << std::endl;
+					std::cout << tr("Error in zip file: ").toLocal8Bit().data() << first_file_name.toLocal8Bit().data() << std::endl;
 					return;
 				}
 
 				if(!zf.open(QIODevice::ReadOnly))
 				{
-					std::cout << "Fehler beim Öffnen des ZIPFiles: " << first_file_name.toLocal8Bit().data();
+					std::cout << tr("Error when opening the zip file: ").toLocal8Bit().data() << first_file_name.toLocal8Bit().data();
 				}
 
 				QFile outfile(unzip_filename);
@@ -143,6 +152,11 @@ void MainWindow::on_actionOpen_CAS_Image_A8CAS_triggered()
 			if(file.exists())
 				file.remove();
 		}
+
+		if(cas.IsOpen())
+		{
+			SetCasButtons(true, true, false, false);
+		}
 	}
 }
 
@@ -163,6 +177,9 @@ void MainWindow::on_cas_start_button_clicked()
 		transmitter->progress_bar = ui->transmit_progress;
 		transmitter->serial_port_name = ui->serial_ports->currentText();
 		transmitter->start();
+
+		SetCasButtons(false, false, true, true);
+		ui->cas_play_status->setText(tr("playing..."));
 	}
 }
 
@@ -189,6 +206,14 @@ void MainWindow::SetPlayTime()
 	}
 }
 
+void MainWindow::SetCasButtons(bool open_btn, bool start_btn, bool pause_btn, bool stop_btn)
+{
+	ui->cas_open_button->setDisabled(!open_btn);
+	ui->cas_start_button->setDisabled(!start_btn);
+	ui->cas_pause_button->setDisabled(!pause_btn);
+	ui->cas_stop_button->setDisabled(!stop_btn);
+}
+
 
 void MainWindow::on_baudrate_spin_valueChanged(int arg1)
 {
@@ -199,5 +224,46 @@ void MainWindow::on_baudrate_spin_valueChanged(int arg1)
 void MainWindow::on_irg_time_spin_valueChanged(int arg1)
 {
 	SetPlayTime();
+}
+
+
+void MainWindow::on_cas_pause_button_clicked()
+{
+	if(transmitter->TogglePause())
+	{
+		ui->cas_pause_button->setText(tr("Continue"));
+		ui->cas_play_status->setText(tr("pause..."));
+	}
+	else
+	{
+		ui->cas_pause_button->setText(tr("Pause"));
+		ui->cas_play_status->setText(tr("playing..."));
+	}
+}
+
+
+void MainWindow::on_cas_stop_button_clicked()
+{
+	transmitter->Stop();
+	ui->cas_pause_button->setText(tr("Pause"));
+	SetCasButtons(true, true, false, false);
+}
+
+
+void MainWindow::on_actionExit_triggered()
+{
+	this->close();
+}
+
+void MainWindow::OnCasIsEnd()
+{
+	SetCasButtons(true, true, false, false);
+	ui->transmit_progress->setValue(0);
+	ui->cas_play_status->setText("");
+}
+
+void MainWindow::OnChangeProgress(int value)
+{
+	ui->transmit_progress->setValue(value);
 }
 

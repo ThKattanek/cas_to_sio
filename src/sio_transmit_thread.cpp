@@ -9,7 +9,7 @@
 //                                              //
 // This source code is Copyright protected!     //
 //                                              //
-// Last changed at 2023-01-04                   //
+// Last changed at 2023-01-23                   //
 // https://github.com/ThKattanek/cas_to_sio     //
 //                                              //
 //////////////////////////////////////////////////
@@ -19,8 +19,10 @@
 
 SIOTransmitThread::SIOTransmitThread(QObject*)
 {
+	port = nullptr;
 	cas = nullptr;
 	progress_bar = nullptr;
+	pause = false;
 
 	max_irg_time = 20000;
 	baudrate_factor = 1.0f;
@@ -76,6 +78,18 @@ float SIOTransmitThread::GetBaudRateFactor()
 int SIOTransmitThread::GetMaxIrgTime()
 {
 	return max_irg_time;
+}
+
+bool SIOTransmitThread::TogglePause()
+{
+	pause = !pause;
+	return pause;
+}
+
+void SIOTransmitThread::Stop()
+{
+	pause = false;
+	thread_end = true;
 }
 
 void SIOTransmitThread::OnBytesWritten(qint64 bytes)
@@ -164,6 +178,8 @@ void SIOTransmitThread::CloseSerialPort()
 		std::cout << "LibSerialPort: " << sp_last_error_message() << std::endl;
 
 	sp_free_port(port);
+
+	port = nullptr;
 }
 
 void SIOTransmitThread::run()
@@ -184,13 +200,15 @@ void SIOTransmitThread::run()
 			CHUNK* chunk;
 			uint16_t baudrate;
 			uint16_t irg_time;
+			uint32_t irq_time_us;
 
 			int chunk_count = cas->GetChunkCount();
 
 			int data_chunk_count = cas->GetDataChunkCount();
 			int data_chunk_number = 0;
 
-			int data_chunk_tranfer_time;
+			uint16_t data_chunk_tranfer_time;
+			uint32_t data_chunk_tranfer_time_us;
 
 			progress_bar->setMaximum(data_chunk_count);
 
@@ -198,6 +216,9 @@ void SIOTransmitThread::run()
 
 			for(int i=0; i<chunk_count; i++)
 			{
+				while(pause)
+					QThread::msleep(1);
+
 				switch(cas->GetChunkType(i))
 				{
 				case CHUNK_TYPE_FUJI:
@@ -227,13 +248,27 @@ void SIOTransmitThread::run()
 					std::cout << "Data CHunk (" << data_chunk_number+1 << "/" << data_chunk_count << ") - Inter-Record Gap: " << irg_time << "ms" << std::endl;
 					data_chunk_number++;
 
-					QThread::msleep(irg_time);
+					irq_time_us = irg_time * 10;
+					for(uint32_t i=0; i < irq_time_us; i++)
+					{
+						QThread::usleep(100);
+						if(thread_end)
+							break;
+					}
 
-					data_chunk_tranfer_time = (chunk->length * 10000) / baudrate;
-					sp_blocking_write(port, chunk->data, chunk->length, data_chunk_tranfer_time * 2);
+					if(!thread_end)
+					{
+						data_chunk_tranfer_time = (chunk->length * 10000) / baudrate;
+						sp_blocking_write(port, chunk->data, chunk->length, data_chunk_tranfer_time * 2);
 
-					QThread::msleep(data_chunk_tranfer_time);
-
+						data_chunk_tranfer_time_us = data_chunk_tranfer_time * 10;
+						for(uint32_t i=0; i < data_chunk_tranfer_time_us; i++)
+						{
+							QThread::usleep(100);
+							if(thread_end)
+								break;
+						}
+					}
 					break;
 
 				case CHUNK_TYPE_FSK:
@@ -261,13 +296,14 @@ void SIOTransmitThread::run()
 					break;
 				}
 
-				progress_bar->setValue(data_counter++);
+				emit ChangeProgress(data_counter++);
+
 				if(thread_end)
 					break;
 			}
+			emit CasIsEnd();
 		}
 		thread_end = true;
 	}
-
 	CloseSerialPort();
 }

@@ -9,7 +9,7 @@
 //                                              //
 // This source code is Copyright protected!     //
 //                                              //
-// Last changed at 2023-01-04                   //
+// Last changed at 2023-01-23                   //
 // https://github.com/ThKattanek/cas_to_sio     //
 //                                              //
 //////////////////////////////////////////////////
@@ -40,13 +40,20 @@ public:
 	float GetBaudRateFactor();
 	int GetMaxIrgTime();
 
+	bool TogglePause();
+	void Stop();
+
 	QString serial_port_name;
 
 	QProgressBar *progress_bar;
 	CASFileClass *cas;
 
-public slots:
+private slots:
 	void OnBytesWritten(qint64 bytes);
+
+signals:
+	void CasIsEnd();
+	void ChangeProgress(int value);
 
 private:
 	bool OpenSerialPort();
@@ -54,6 +61,7 @@ private:
 
 	sp_port* port;
 	struct sp_event_set *event_set;
+	bool pause;
 	bool thread_end;
 
 	int max_irg_time;			// in ms (Default 20000)
