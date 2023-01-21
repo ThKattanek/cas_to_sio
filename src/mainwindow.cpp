@@ -46,6 +46,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 	connect(transmitter, SIGNAL(CasIsEnd()), this, SLOT(OnCasIsEnd()));
 	connect(transmitter, SIGNAL(ChangeProgress(int, int)), this, SLOT(OnChangeProgress(int, int)));
+	connect(transmitter, SIGNAL(MessageLog(QString)), this, SLOT(OnMessageLog(QString)));
 
 #ifdef _WIN32
 	setWindowTitle("CasToSio Version " + QString(VERSION_STRING) + " --- [Windows " + QString(ARCHITECTURE_STRING) + "]");
@@ -173,6 +174,9 @@ void MainWindow::on_cas_start_button_clicked()
 {
 	if(cas.IsOpen())
 	{
+		ui->log_list->clear();
+		ui->log_list->scrollToBottom();
+
 		transmitter->SetBaudRateFactor(ui->baudrate_spin->value() / 100.0f);
 		transmitter->SetMaxIrgTime(ui->irg_time_spin->value());
 
@@ -273,5 +277,11 @@ void MainWindow::OnChangeProgress(int progress, int time_counter)
 {
 	ui->transmit_progress->setValue(progress);
 	ui->remaining_time_label->setText(ConvertTimeToString(current_playtime - time_counter));
+}
+
+void MainWindow::OnMessageLog(QString message)
+{
+	ui->log_list->addItem(message);
+	ui->log_list->scrollToBottom();
 }
 

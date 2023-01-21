@@ -48,9 +48,6 @@ public:
 	QProgressBar *progress_bar;
 	CASFileClass *cas;
 
-private slots:
-	void OnBytesWritten(qint64 bytes);
-
 signals:
 	void CasIsEnd();
 	void ChangeProgress(int progress, int time_counter);

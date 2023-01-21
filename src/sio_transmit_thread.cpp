@@ -15,7 +15,9 @@
 //////////////////////////////////////////////////
 
 #include "sio_transmit_thread.h"
-#include <iostream>
+//#include <iostream>
+
+#define log(msg) MessageLog(msg)
 
 SIOTransmitThread::SIOTransmitThread(QObject*)
 {
@@ -92,11 +94,6 @@ void SIOTransmitThread::Stop()
 	thread_end = true;
 }
 
-void SIOTransmitThread::OnBytesWritten(qint64 bytes)
-{
-	std::cout << "Written Bytes: " << bytes << std::endl;
-}
-
 bool SIOTransmitThread::OpenSerialPort()
 {
 	enum sp_return result;
@@ -104,14 +101,14 @@ bool SIOTransmitThread::OpenSerialPort()
 	result = sp_get_port_by_name(serial_port_name.toLocal8Bit().data(), &port);
 	if(result != SP_OK)
 	{
-		std::cout << "LibSerialPort: " << sp_last_error_message() << std::endl;
+		emit log("LibSerialPort: " + QString(sp_last_error_message()));
 		return false;
 	}
 
 	result = sp_open(port, SP_MODE_WRITE);
 	if(result != SP_OK)
 	{
-		std::cout << "LibSerialPort: " << sp_last_error_message() << std::endl;
+		emit log("LibSerialPort: " + QString(sp_last_error_message()));
 		return false;
 	}
 
@@ -119,14 +116,14 @@ bool SIOTransmitThread::OpenSerialPort()
 	result = sp_new_event_set(&event_set);
 	if(result != SP_OK)
 	{
-		std::cout << "LibSerialPort: " << sp_last_error_message() << std::endl;
+		emit log("LibSerialPort: " + QString(sp_last_error_message()));
 		return false;
 	}
 
 	result = sp_add_port_events(event_set, port, SP_EVENT_TX_READY);
 	if(result != SP_OK)
 	{
-		std::cout << "LibSerialPort: " << sp_last_error_message() << std::endl;
+		emit log("LibSerialPort: " + QString(sp_last_error_message()));
 		return false;
 	}
 
@@ -134,35 +131,35 @@ bool SIOTransmitThread::OpenSerialPort()
 	result = sp_set_baudrate(port, 600);
 	if(result != SP_OK)
 	{
-		std::cout << "LibSerialPort: " << sp_last_error_message() << std::endl;
+		emit log("LibSerialPort: " + QString(sp_last_error_message()));
 		return false;
 	}
 
 	result = sp_set_bits(port, 8);
 	if(result != SP_OK)
 	{
-		std::cout << "LibSerialPort: " << sp_last_error_message() << std::endl;
+		emit log("LibSerialPort: " + QString(sp_last_error_message()));
 		return false;
 	}
 
 	result = sp_set_parity(port, SP_PARITY_NONE);
 	if(result != SP_OK)
 	{
-		std::cout << "LibSerialPort: " << sp_last_error_message() << std::endl;
+		emit log("LibSerialPort: " + QString(sp_last_error_message()));
 		return false;
 	}
 
 	result = sp_set_stopbits(port, 1);
 	if(result != SP_OK)
 	{
-		std::cout << "LibSerialPort: " << sp_last_error_message() << std::endl;
+		emit log("LibSerialPort: " + QString(sp_last_error_message()));
 		return false;
 	}
 
 	result = sp_set_flowcontrol(port, SP_FLOWCONTROL_NONE);
 	if(result != SP_OK)
 	{
-		std::cout << "LibSerialPort: " << sp_last_error_message() << std::endl;
+		emit log("LibSerialPort: " + QString(sp_last_error_message()));
 		return false;
 	}
 
@@ -175,7 +172,7 @@ void SIOTransmitThread::CloseSerialPort()
 
 	result = sp_close(port);
 	if(result != SP_OK)
-		std::cout << "LibSerialPort: " << sp_last_error_message() << std::endl;
+		emit log("LibSerialPort: " + QString(sp_last_error_message()));
 
 	sp_free_port(port);
 
@@ -197,10 +194,10 @@ void SIOTransmitThread::run()
 	{
 		if(cas != nullptr)
 		{
+			QString message;
 			CHUNK* chunk;
 			uint16_t baudrate;
 			uint16_t irg_time;
-			uint32_t irq_time_us;
 
 			int chunk_count = cas->GetChunkCount();
 			int time_counter = 0;
@@ -209,7 +206,6 @@ void SIOTransmitThread::run()
 			int data_chunk_number = 0;
 
 			uint16_t data_chunk_tranfer_time;
-			uint32_t data_chunk_tranfer_time_us;
 
 			progress_bar->setMaximum(data_chunk_count);
 
@@ -223,7 +219,7 @@ void SIOTransmitThread::run()
 				switch(cas->GetChunkType(i))
 				{
 				case CHUNK_TYPE_FUJI:
-					std::cout << "FUJI Chunk..." << std::endl;
+					emit MessageLog("FUJI Chunk...");
 					break;
 
 				case CHUNK_TYPE_BAUD:
@@ -232,11 +228,11 @@ void SIOTransmitThread::run()
 
 					baudrate *= baudrate_factor;
 
-					std::cout << "Set Baudrate: " << baudrate << std::endl;
+					emit log("Set Baudrate: " + QString::number(baudrate));
 
 					result = sp_set_baudrate(port, baudrate);
 					if(result != SP_OK)
-						std::cout << "LibSerialPort: " << sp_last_error_message() << std::endl;
+						emit log("LibSerialPort: " + QString(sp_last_error_message()));
 					break;
 
 				case CHUNK_TYPE_DATA:
@@ -246,7 +242,7 @@ void SIOTransmitThread::run()
 					if(irg_time > max_irg_time)
 						irg_time = max_irg_time;
 
-					std::cout << "Data CHunk (" << data_chunk_number+1 << "/" << data_chunk_count << ") - Inter-Record Gap: " << irg_time << "ms" << std::endl;
+					emit log("Data CHunk (" + QString::number( data_chunk_number+1) + "/" + QString::number(data_chunk_count) + ") - Inter-Record Gap: " + QString::number(irg_time) + "ms");
 					data_chunk_number++;
 
 					time_counter += irg_time;
@@ -275,27 +271,27 @@ void SIOTransmitThread::run()
 					break;
 
 				case CHUNK_TYPE_FSK:
-					std::cout << "FSK Chunk..." << std::endl;
+					emit log("FSK Chunk...");
 					break;
 
 				case CHUNK_TYPE_PWM1:
-					std::cout << "PWM1 Chunk..." << std::endl;
+					emit log("PWM1 Chunk...");
 					break;
 
 				case CHUNK_TYPE_PWMC:
-					std::cout << "PWMC Chunk..." << std::endl;
+					emit log("PWMC Chunk...");
 					break;
 
 				case CHUNK_TYPE_PWMD:
-					std::cout << "PWMD Chunk..." << std::endl;
+					emit log("PWMD Chunk...");
 					break;
 
 				case CHUNK_TYPE_PWMS:
-					std::cout << "PWMS Chunk..." << std::endl;
+					emit log("PWMS Chunk...");
 					break;
 
 				default:
-					std::cout << "Unknow Chunk..." << std::endl;
+					emit log("Unknow Chunk...");
 					break;
 				}
 

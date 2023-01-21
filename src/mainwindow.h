@@ -56,6 +56,7 @@ private slots:
 
 	void OnCasIsEnd();
 	void OnChangeProgress(int progress, int time_counter);
+	void OnMessageLog(QString message);
 
 private:
 	void SetPlayTime();
