@@ -201,6 +201,7 @@ void SIOTransmitThread::run()
 
 			int chunk_count = cas->GetChunkCount();
 			int time_counter = 0;
+			int time_counter_tmp;
 
 			int data_chunk_count = cas->GetDataChunkCount();
 			int data_chunk_number = 0;
@@ -242,31 +243,39 @@ void SIOTransmitThread::run()
 					if(irg_time > max_irg_time)
 						irg_time = max_irg_time;
 
-					emit log("Data CHunk (" + QString::number( data_chunk_number+1) + "/" + QString::number(data_chunk_count) + ") - Inter-Record Gap: " + QString::number(irg_time) + "ms");
+					emit log("Data Chunk (" + QString::number( data_chunk_number+1) + "/" + QString::number(data_chunk_count) + ") - Inter-Record Gap: " + QString::number(irg_time) + "ms");
 					data_chunk_number++;
 
-					time_counter += irg_time;
+					time_counter_tmp = time_counter;
 
 					for(uint32_t i=0; i < irg_time / 10; i++)
 					{
+						time_counter_tmp += 10;
+						emit ChangeProgress(data_counter, time_counter_tmp);
 						QThread::msleep(10);
 						if(thread_end)
 							break;
 					}
+
+					time_counter += irg_time;
 
 					if(!thread_end)
 					{
 						data_chunk_tranfer_time = (chunk->length * 10000) / baudrate;
 						sp_blocking_write(port, chunk->data, chunk->length, data_chunk_tranfer_time * 2);
 
-						time_counter += data_chunk_tranfer_time;
+						time_counter_tmp = time_counter;
 
 						for(uint32_t i=0; i < data_chunk_tranfer_time / 10; i++)
 						{
+							time_counter_tmp += 10;
+							emit ChangeProgress(data_counter, time_counter_tmp);
 							QThread::msleep(10);
 							if(thread_end)
 								break;
 						}
+
+						time_counter += data_chunk_tranfer_time;
 					}
 					break;
 

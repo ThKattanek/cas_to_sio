@@ -222,6 +222,8 @@ void MainWindow::SetCasButtons(bool open_btn, bool start_btn, bool pause_btn, bo
 	ui->cas_start_button->setDisabled(!start_btn);
 	ui->cas_pause_button->setDisabled(!pause_btn);
 	ui->cas_stop_button->setDisabled(!stop_btn);
+
+	ui->actionOpen_CAS_Image_A8CAS->setDisabled(!open_btn);
 }
 
 
