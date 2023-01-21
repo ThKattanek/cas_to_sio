@@ -55,14 +55,17 @@ private slots:
 	void on_actionExit_triggered();
 
 	void OnCasIsEnd();
-	void OnChangeProgress(int value);
+	void OnChangeProgress(int progress, int time_counter);
 
 private:
 	void SetPlayTime();
+	QString ConvertTimeToString(int time_ms);
 	void SetCasButtons(bool open_btn, bool start_btn, bool pause_btn, bool stop_btn);
 
 	Ui::MainWindow *ui;
 	CASFileClass cas;
 	SIOTransmitThread *transmitter;
+
+	int current_playtime;
 };
 #endif // MAINWINDOW_H

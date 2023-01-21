@@ -53,7 +53,8 @@ private slots:
 
 signals:
 	void CasIsEnd();
-	void ChangeProgress(int value);
+	void ChangeProgress(int progress, int time_counter);
+	void MessageLog(QString message);
 
 private:
 	bool OpenSerialPort();

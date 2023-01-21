@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>591</width>
+    <width>652</width>
     <height>335</height>
    </rect>
   </property>
@@ -190,11 +190,22 @@
      </layout>
     </item>
     <item>
-     <widget class="QProgressBar" name="transmit_progress">
-      <property name="value">
-       <number>0</number>
-      </property>
-     </widget>
+     <layout class="QHBoxLayout" name="horizontalLayout_7">
+      <item>
+       <widget class="QProgressBar" name="transmit_progress">
+        <property name="value">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="remaining_time_label">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -265,7 +276,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>591</width>
+     <width>652</width>
      <height>23</height>
     </rect>
    </property>

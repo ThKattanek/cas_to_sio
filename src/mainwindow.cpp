@@ -41,8 +41,11 @@ MainWindow::MainWindow(QWidget *parent)
 
 	ui->cas_play_status->setText("");
 
+	ui->remaining_time_label->setText(ConvertTimeToString(0));
+	ui->remaining_time_label->setToolTip(tr("Remaining Time"));
+
 	connect(transmitter, SIGNAL(CasIsEnd()), this, SLOT(OnCasIsEnd()));
-	connect(transmitter, SIGNAL(ChangeProgress(int)), this, SLOT(OnChangeProgress(int)));
+	connect(transmitter, SIGNAL(ChangeProgress(int, int)), this, SLOT(OnChangeProgress(int, int)));
 
 #ifdef _WIN32
 	setWindowTitle("CasToSio Version " + QString(VERSION_STRING) + " --- [Windows " + QString(ARCHITECTURE_STRING) + "]");
@@ -188,22 +191,25 @@ void MainWindow::SetPlayTime()
 	if(cas.IsOpen())
 	{
 		int time = cas.GetPlayTime(ui->irg_time_spin->value(), ui->baudrate_spin->value() / 100.0f);
-
-		time /=100;
-
-		int ss = time % 10;
-		time /= 10;
-		int s = time % 60;
-		time /= 60;
-		int m = time % 60;
-		time /= 60;
-		int h = time % 60;
-		time /= 60;
-
-		QString out = QString::number(h).rightJustified(2, '0') + ":" + QString::number(m).rightJustified(2, '0') + ":" + QString::number(s).rightJustified(2, '0') + "." + QString::number(ss).rightJustified(1, '0');
-
-		ui->playtime_label->setText(out);
+		current_playtime = time;
+		ui->playtime_label->setText(ConvertTimeToString(current_playtime));
 	}
+}
+
+QString MainWindow::ConvertTimeToString(int time_ms)
+{
+	time_ms /=100;
+
+	int ss = time_ms % 10;
+	time_ms /= 10;
+	int s = time_ms % 60;
+	time_ms /= 60;
+	int m = time_ms % 60;
+	time_ms /= 60;
+	int h = time_ms % 60;
+	time_ms /= 60;
+
+	return QString::number(h).rightJustified(2, '0') + ":" + QString::number(m).rightJustified(2, '0') + ":" + QString::number(s).rightJustified(2, '0') + "." + QString::number(ss).rightJustified(1, '0');
 }
 
 void MainWindow::SetCasButtons(bool open_btn, bool start_btn, bool pause_btn, bool stop_btn)
@@ -246,6 +252,7 @@ void MainWindow::on_cas_stop_button_clicked()
 {
 	transmitter->Stop();
 	ui->cas_pause_button->setText(tr("Pause"));
+	ui->cas_play_status->setText("");
 	SetCasButtons(true, true, false, false);
 }
 
@@ -262,8 +269,9 @@ void MainWindow::OnCasIsEnd()
 	ui->cas_play_status->setText("");
 }
 
-void MainWindow::OnChangeProgress(int value)
+void MainWindow::OnChangeProgress(int progress, int time_counter)
 {
-	ui->transmit_progress->setValue(value);
+	ui->transmit_progress->setValue(progress);
+	ui->remaining_time_label->setText(ConvertTimeToString(current_playtime - time_counter));
 }
 
