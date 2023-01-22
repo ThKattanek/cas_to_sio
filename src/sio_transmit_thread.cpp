@@ -195,19 +195,17 @@ void SIOTransmitThread::run()
 		{
 			QString message;
 			CHUNK* chunk;
-			uint16_t baudrate;
+			uint16_t baudrate = 600;
 			uint16_t irg_time;
 
 			int chunk_count = cas->GetChunkCount();
 			int time_counter = 0;
-			int time_counter_tmp;
+			int time_counter_tmp = 0;
 
 			int data_chunk_count = cas->GetDataChunkCount();
 			int data_chunk_number = 0;
 
 			uint16_t data_chunk_tranfer_time;
-
-			int data_counter = 0;
 
 			for(int i=0; i<chunk_count; i++)
 			{
@@ -302,8 +300,6 @@ void SIOTransmitThread::run()
 				}
 
 				emit ChangeProgress(time_counter_tmp, time_counter);
-
-				data_counter++;
 
 				if(thread_end)
 					break;

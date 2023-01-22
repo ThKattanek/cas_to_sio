@@ -9,7 +9,7 @@
 #//                                              //
 #// This source code is Copyright protected!     //
 #//                                              //
-#// Last changed at 2023-01-07                   //
+#// Last changed at 2023-01-22                   //
 #// https://github.com/ThKattanek/cas_to_sio     //
 #//                                              //
 #//////////////////////////////////////////////////
@@ -24,6 +24,7 @@ TARGET = castosio
 TEMPLATE = app
 
 CONFIG += c++17
+CONFIG += object_parallel_to_source
 
 CASTOSIO_VERSION = 0.1.0
 
@@ -43,6 +44,9 @@ contains(QT_ARCH, x86_64){
 } else {
     CASTOSIO_ARCH = Unknown
 }
+
+# Compilerflags
+QMAKE_CXXFLAGS+=-Wno-multichar
 
 DEFINES += ARCHITECTURE_STRING=\\\"$$CASTOSIO_ARCH\\\"
 
@@ -88,9 +92,9 @@ win32 {
 txt.CONFIG += nostrip
 txt.files += ../LICENSE
 
-INSTALLS += target txt
+#INSTALLS += target txt
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target
+!isEmpty(target.path): INSTALLS += target txt

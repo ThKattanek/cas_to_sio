@@ -225,13 +225,13 @@ void MainWindow::SetCasButtons(bool open_btn, bool start_btn, bool pause_btn, bo
 }
 
 
-void MainWindow::on_baudrate_spin_valueChanged(int arg1)
+void MainWindow::on_baudrate_spin_valueChanged(int )
 {
 	SetPlayTime();
 }
 
 
-void MainWindow::on_irg_time_spin_valueChanged(int arg1)
+void MainWindow::on_irg_time_spin_valueChanged(int)
 {
 	SetPlayTime();
 }

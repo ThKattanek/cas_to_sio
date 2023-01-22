@@ -9,7 +9,7 @@
 //                                              //
 // This source code is Copyright protected!     //
 //                                              //
-// Last changed at 2023-01-21                   //
+// Last changed at 2023-01-22                   //
 // https://github.com/ThKattanek/cas_to_sio     //
 //                                              //
 //////////////////////////////////////////////////
@@ -48,8 +48,8 @@ private slots:
 	void on_actionOpen_CAS_Image_A8CAS_triggered();
 	void on_cas_open_button_clicked();
 	void on_cas_start_button_clicked();
-	void on_baudrate_spin_valueChanged(int arg1);
-	void on_irg_time_spin_valueChanged(int arg1);
+	void on_baudrate_spin_valueChanged(int);
+	void on_irg_time_spin_valueChanged(int);
 	void on_cas_pause_button_clicked();
 	void on_cas_stop_button_clicked();
 	void on_actionExit_triggered();
