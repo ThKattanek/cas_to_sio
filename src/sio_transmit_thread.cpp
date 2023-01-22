@@ -9,7 +9,7 @@
 //                                              //
 // This source code is Copyright protected!     //
 //                                              //
-// Last changed at 2023-01-23                   //
+// Last changed at 2023-01-22                   //
 // https://github.com/ThKattanek/cas_to_sio     //
 //                                              //
 //////////////////////////////////////////////////
@@ -23,7 +23,6 @@ SIOTransmitThread::SIOTransmitThread(QObject*)
 {
 	port = nullptr;
 	cas = nullptr;
-	progress_bar = nullptr;
 	pause = false;
 
 	max_irg_time = 20000;
@@ -208,8 +207,6 @@ void SIOTransmitThread::run()
 
 			uint16_t data_chunk_tranfer_time;
 
-			progress_bar->setMaximum(data_chunk_count);
-
 			int data_counter = 0;
 
 			for(int i=0; i<chunk_count; i++)
@@ -251,7 +248,7 @@ void SIOTransmitThread::run()
 					for(uint32_t i=0; i < irg_time / 10; i++)
 					{
 						time_counter_tmp += 10;
-						emit ChangeProgress(data_counter, time_counter_tmp);
+						emit ChangeProgress(time_counter_tmp, time_counter_tmp);
 						QThread::msleep(10);
 						if(thread_end)
 							break;
@@ -269,7 +266,7 @@ void SIOTransmitThread::run()
 						for(uint32_t i=0; i < data_chunk_tranfer_time / 10; i++)
 						{
 							time_counter_tmp += 10;
-							emit ChangeProgress(data_counter, time_counter_tmp);
+							emit ChangeProgress(time_counter_tmp, time_counter_tmp);
 							QThread::msleep(10);
 							if(thread_end)
 								break;
@@ -304,7 +301,9 @@ void SIOTransmitThread::run()
 					break;
 				}
 
-				emit ChangeProgress(data_counter++, time_counter);
+				emit ChangeProgress(time_counter_tmp, time_counter);
+
+				data_counter++;
 
 				if(thread_end)
 					break;

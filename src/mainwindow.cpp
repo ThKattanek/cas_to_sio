@@ -9,7 +9,7 @@
 //                                              //
 // This source code is Copyright protected!     //
 //                                              //
-// Last changed at 2023-01-21                   //
+// Last changed at 2023-01-22                   //
 // https://github.com/ThKattanek/cas_to_sio     //
 //                                              //
 //////////////////////////////////////////////////
@@ -99,8 +99,6 @@ void MainWindow::on_actionOpen_CAS_Image_A8CAS_triggered()
 				QString first_file_name = zip.getFileNameList()[0];
 				unzip_filename += first_file_name;
 
-				//std::cout << "Zip is Open. " << zip.getEntriesCount() << " [" << first_file_name.toLocal8Bit().data() << "]" << std::endl;
-
 				QuaZipFile zf(&zip);
 				if(!zip.setCurrentFile(first_file_name))
 				{
@@ -181,7 +179,7 @@ void MainWindow::on_cas_start_button_clicked()
 		transmitter->SetMaxIrgTime(ui->irg_time_spin->value());
 
 		transmitter->cas = &cas;
-		transmitter->progress_bar = ui->transmit_progress;
+		ui->transmit_progress->setMaximum(cas.GetPlayTime(ui->irg_time_spin->value() , ui->baudrate_spin->value() / 100.0f));
 		transmitter->serial_port_name = ui->serial_ports->currentText();
 		transmitter->start();
 

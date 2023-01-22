@@ -9,7 +9,7 @@
 //                                              //
 // This source code is Copyright protected!     //
 //                                              //
-// Last changed at 2023-01-23                   //
+// Last changed at 2023-01-22                   //
 // https://github.com/ThKattanek/cas_to_sio     //
 //                                              //
 //////////////////////////////////////////////////
@@ -17,7 +17,6 @@
 #ifndef SIOTRANSMITTHREAD_H
 #define SIOTRANSMITTHREAD_H
 
-#include <QProgressBar>
 #include <QThread>
 #include <QStringList>
 
@@ -45,7 +44,6 @@ public:
 
 	QString serial_port_name;
 
-	QProgressBar *progress_bar;
 	CASFileClass *cas;
 
 signals:
