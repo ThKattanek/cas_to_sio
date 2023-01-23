@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=CasToSio
+Comment=Transfer CAS files to atari over the sio bus.
+Comment[de]=Übertrage CAS Files zum Atari 800 über den SIO Bus.
+Icon=cas_to_sio_icon_64x64
+TryExec=castosio
+Exec=castosio %f
+MimeType=application/x-geogebra-file;application/x-geogebra-tool;
+Categories=Development;System;Utility;

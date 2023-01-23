@@ -75,8 +75,12 @@ win32 {
     LIBS += -lquazip5 -lserialport
 }
 
-# Installation
+# Resourcen
 
+# windows
+RC_FILE += cas_to_sio.rc
+
+# Installation
 message(Installpath: $$PREFIX)
 DEFINES += DATA_PATH=\\\"$$PREFIX\\\"
 
@@ -86,15 +90,26 @@ win32 {
 } else {
     target.path = $$PREFIX/bin
     txt.path = $$PREFIX/share/doc/$$TARGET
+    desktop.path = $$PREFIX/share/applications
+    icons.path = $$PREFIX/share/icons/hicolor/64x64/apps
 }
 
 # TXT
 txt.CONFIG += nostrip
 txt.files += ../LICENSE
 
-#INSTALLS += target txt
+# Linux Install Startmenü Eintrag
+## /usr/local/share/icons/hicolor/64x64/apps/
+linux
+{
+    desktop.CONFIG += nostrip
+    desktop.files += cas_to_sio.desktop
+
+    icons.CONFIG += nostrip
+    icons.files += ../graphics/cas_to_sio_icon_64x64.png
+}
 
 # Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target txt
+#qnx: target.path = /tmp/$${TARGET}/bin
+#else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target txt icons desktop
