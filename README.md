@@ -10,6 +10,6 @@ Here is the pinout from the atari sio connector.
 ![SIO-Pinout](graphics/sio_connector.png)
 
 Connection
-+---+----+
-|yyy|cccc|
-+---+----+
+
+| PL2303    | Atari SIO |
+|-----------|-----------|
