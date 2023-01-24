@@ -9,7 +9,9 @@ Your must have a usb to uart adapter how this here or similar. The best is with 
 Here is the pinout from the atari sio connector.
 ![SIO-Pinout](graphics/sio_connector.png)
 
-Connection
-
+### Connection:
+##
 | PL2303    | Atari SIO |
 |-----------|-----------|
+| TX | Pin 3 |  
+| GND | Pin 4 | 
