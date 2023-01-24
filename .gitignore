@@ -2,6 +2,8 @@
 # ----------------------------------------------------------------------------
 build
 public_release
+build_system
+install_linux
 
 *~
 *.autosave
