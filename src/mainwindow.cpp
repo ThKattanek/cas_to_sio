@@ -44,7 +44,11 @@ MainWindow::MainWindow(QWidget *parent)
 	ui->remaining_time_label->setText(ConvertTimeToString(0));
 	ui->remaining_time_label->setToolTip(tr("Remaining Time"));
 
+	qRegisterMetaType<uint8_t>("uint8_t");
+	qRegisterMetaType<uint16_t>("uint16_t");
+
 	connect(transmitter, SIGNAL(CasIsEnd()), this, SLOT(OnCasIsEnd()));
+	connect(transmitter, SIGNAL(UpdateData(uint8_t*,uint16_t)), ui->SerialData, SLOT(OnUpdateData(uint8_t*,uint16_t)));
 	connect(transmitter, SIGNAL(ChangeProgress(int, int)), this, SLOT(OnChangeProgress(int, int)));
 	connect(transmitter, SIGNAL(MessageLog(QString)), this, SLOT(OnMessageLog(QString)));
 

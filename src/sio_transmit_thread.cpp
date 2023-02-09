@@ -257,6 +257,7 @@ void SIOTransmitThread::run()
 					if(!thread_end)
 					{
 						data_chunk_tranfer_time = (chunk->length * 10000) / baudrate;
+						emit UpdateData(chunk->data, chunk->length);
 						sp_blocking_write(port, chunk->data, chunk->length, data_chunk_tranfer_time * 2);
 
 						time_counter_tmp = time_counter;

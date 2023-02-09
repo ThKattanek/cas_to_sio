@@ -56,16 +56,19 @@ SOURCES += \
     cas_file_class.cpp \
     main.cpp \
     mainwindow.cpp \
+    serial_data_visibly_widget.cpp \
     sio_transmit_thread.cpp
 
 HEADERS += \
     cas_file_class.h \
     mainwindow.h \
     qutils.h \
+    serial_data_visibly_widget.h \
     sio_transmit_thread.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    serial_data_visibly_widget.ui
 
 win32 {
     CONFIG += link_pkgconfig

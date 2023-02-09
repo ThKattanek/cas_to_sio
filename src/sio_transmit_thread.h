@@ -48,6 +48,7 @@ public:
 
 signals:
 	void CasIsEnd();
+	void UpdateData(uint8_t* data, uint16_t length);
 	void ChangeProgress(int progress, int time_counter);
 	void MessageLog(QString message);
 
