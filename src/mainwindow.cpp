@@ -9,7 +9,7 @@
 //                                              //
 // This source code is Copyright protected!     //
 //                                              //
-// Last changed at 2023-01-22                   //
+// Last changed at 2023-02-16                   //
 // https://github.com/ThKattanek/cas_to_sio     //
 //                                              //
 //////////////////////////////////////////////////
@@ -43,6 +43,10 @@ MainWindow::MainWindow(QWidget *parent)
 
 	ui->remaining_time_label->setText(ConvertTimeToString(0));
 	ui->remaining_time_label->setToolTip(tr("Remaining Time"));
+
+	ui->SerialData->EnableAntialiasing(true);
+	ui->SerialData->SetBackgroundColor(QColor(0,50,0,255));
+	ui->SerialData->SetForegroundColor(QColor(0,255,0,200));
 
 	qRegisterMetaType<uint8_t>("uint8_t");
 	qRegisterMetaType<uint16_t>("uint16_t");
